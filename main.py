@@ -89,5 +89,91 @@ def get_age_range(min_age, max_age):
     for person in people:
         printer.pprint(person)
 
-get_age_range(20,35)
+'''get_age_range(20,35)'''
 
+def project_columns():
+    columns = {"_id":0, "first_name": 1, "last_name": 1}
+    people = person_collection.find({}, columns)
+
+    for person in people:
+        printer.pprint(person)
+
+'''project_columns()'''
+
+def update_person_by_id(person_id):
+    from bson.objectid import ObjectId
+
+    _id = ObjectId(person_id)
+
+    # all_updates ={
+    #     "$set": {"new_field": True},
+    #     "$inc": {"age": 1},
+    #     "$rename": {"first_name": "first", "last_name": "last"}
+    # }
+    # person_collection.update_one({"_id": _id}, all_updates)
+
+    person_collection.update_one({"_id": _id},  {"$unset": {"new_field": ""}})
+
+'''update_person_by_id("64b5c71dea59630b0f81776d")'''
+
+def replace_one(person_id):
+    from bson.objectid import ObjectId
+    _id = ObjectId(person_id)
+    
+    new_doc = {
+         "first_name": "new first name",
+         "last_name": "new last name",
+         "age": 100
+     }
+    
+    person_collection.replace_one({"_id": _id}, new_doc)
+
+'''replace_one("64b5c71dea59630b0f81776d")'''
+def delete_doc_by_id(person_id):
+    from bson.objectid import ObjectId
+    _id = ObjectId(person_id)
+
+    person_collection.delete_one({"_id": _id})
+'''delete_doc_by_id("64b5c71dea59630b0f81776d")'''
+
+address = {
+    "_id":"64b5c71dea59630b0f81776d",
+    "street":"Bay Street",
+    "number": 2706,
+    "city": "San Francisco",
+    "country": "United States",
+    "zip": "94107",
+    # "owner_id": "64b5c71dea59630b0"
+}
+
+# person = {
+#     "_id": "64b5c71dea59630b0",
+#     "first_name": "Muslim",
+    # "address":{
+    #    "_id":"64b5c71dea59630b0f81776d",
+    # "street":"Bay Street",
+    # "number": 2706,
+    # "city": "San Francisco",
+    # "country": "United States",
+    # "zip": "94107" 
+#     }
+# }
+def add_address_embed(person_id, address):
+    from bson.objectid import ObjectId
+    _id = ObjectId(person_id)
+
+    person_collection.update_one({"_id": _id}, {"$addToSet":{"addresses": address}})
+'''add_address_embed("64b5c71dea59630b0f81776e", address)'''
+
+def add_address_relationship(person_id, address):
+    from bson.objectid import ObjectId
+    _id = ObjectId(person_id)
+
+    address = address.copy()
+    address["owner_id"] = person_id
+
+    #create new collection
+    address_collection = production.address
+    address_collection.insert_one(address)
+
+add_address_relationship("64b5c71dea59630b0f81776f", address)

@@ -1,0 +1,95 @@
+db.customers.insertOne({ 
+    username: "oabdi", 
+    name: "Omar Abadi", 
+    email: "omar_abadi@gmail.com", 
+    accounts: [
+        271598, 
+        424292, 
+        265515, 
+        338029, 
+        322472] 
+    })
+      
+
+    db.customers.insertOne(
+        {
+         username: "oabadi",
+         name: "Omar Abadi",
+         email: "omar_abadi@gmail.com",
+         accounts: [
+            271598,
+            424292,
+            265515,
+            338029,
+            322472
+              ]
+        }
+      )
+
+
+      db.customers.insertMany([
+        {
+            "username": "bronner56",
+            "name": "Emily Bronner",
+            "email": "bronner56@gmail.com",
+            "accounts": [
+                471511,
+                326992
+            ],
+                },
+                {
+            "username": "smendez",
+            "name": "Shawn Mendez",
+            "email": "mendez_shawn@gmail.com",
+            "accounts": [
+                271598
+            ],
+            },
+            {
+            "username": "Shapir0",
+            "name": "Dale Shapiro",
+            "email": "Shapir000@gmail.com",
+            "accounts": [
+                481591,
+                364282,
+                165343,
+                139669,
+                356924
+            ],
+        },
+    ])
+
+
+    db.transactions.find({ transaction_count: {$gt: 10, $lt: 100}}, { _id: 0, account_id: 1, transaction_count: 1}).sort({transaction_count: 1}).limit(10)
+    db.transactions.explain().find({ transaction_count: {$gt: 10, $lt: 100}}, { _id: 0, account_id: 1, transaction_count: 1}).sort({transaction_count: 1}).limit(10)
+    
+    db.customers.updateOne({ username: "todd60"}, { $set: { email: "todd60@gmail.com"}}, { upsert: true })
+
+    db.accounts.deleteOne({ account_id: 604732 })
+    db.transactions.deleteMany({ transaction_count: { $lt: 5}});
+
+    db.transfers.aggregate( [
+        {
+          $lookup:
+            {
+              from: "accounts",
+              localField: "transfer_id",
+              foreignField: "transfers_complete",
+              pipeline: [
+     
+                 { $project: { _id: 0, account_id: 1, account_holder: 1 } }
+              ],
+              as: "account_holder"
+          }
+      }] )
+
+      db.transactions.aggregate([
+        {
+          $lookup: {
+            from: "accounts",
+            localField: "account_id",
+            foreignField: "account_id",
+            as: "account_info",
+          },
+        },
+      ]);
